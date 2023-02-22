@@ -572,7 +572,9 @@ workflows:
       - validate-metadata:
           requires:
             - generate-sql
-      - integration
+      - integration:
+          requires:
+            - build
       - validate-dags:
           requires:
             - generate-dags
