@@ -57,7 +57,8 @@ stage_2 AS (
         )
       FROM
         UNNEST(
-          ARRAY<STRUCT<mean_old FLOAT64, stddev_old FLOAT64>>[
+          --ARRAY<STRUCT<mean_old FLOAT64, stddev_old FLOAT64>>[
+          [
             (b.rc_value, b.rc_mean_subtest_stddev),
             (a.rc_one_week_prior_average, a.rc_one_week_prior_mean_stddev),
             (a.rc_two_week_prior_average, a.rc_two_week_prior_mean_stddev),
@@ -124,7 +125,8 @@ stage_4 AS (
         )
       FROM
         UNNEST(
-          ARRAY<STRUCT<value FLOAT64, pct FLOAT64, _interpreted_change STRING, confidence FLOAT64>>[
+          --ARRAY<STRUCT<value FLOAT64, pct FLOAT64, _interpreted_change STRING, confidence FLOAT64>>
+          [
             (
               target_value,
               target_pct_diff,

@@ -17,7 +17,8 @@ static_combos AS (
     combos.*
   FROM
     UNNEST(
-      ARRAY<STRUCT<ping_type STRING, os STRING, app_build_id STRING>>[
+      --ARRAY<STRUCT<ping_type STRING, os STRING, app_build_id STRING>>
+      [
         (NULL, NULL, NULL),
         (NULL, NULL, "*"),
         (NULL, "*", NULL),

@@ -34,7 +34,8 @@ SELECT
   )
 FROM
   UNNEST(
-    ARRAY<STRUCT<start DATETIME, `end` DATETIME, expected INT64>>[
+    --ARRAY<STRUCT<start DATETIME, `end` DATETIME, expected INT64>>
+    [
       -- start at middle of month
       (DATETIME "2021-01-15", DATETIME "2021-03-18", 2),
       (DATETIME "2021-01-15", DATETIME "2021-03-17", 1),

@@ -8,50 +8,40 @@ from typing import Dict, Iterator, List, Tuple
 
 import click
 import yaml
+import sqlglot
 
 from bigquery_etl.schema.stable_table_schema import get_stable_table_schemas
 from bigquery_etl.util.common import render
 
 stable_views = None
 
-try:
-    import jnius_config  # noqa: E402
 
-    if not jnius_config.vm_running:
-        # this has to run before jnius is imported the first time
-        target = Path(__file__).parent.parent / "target"
-        for path in target.glob("*.jar"):
-            jnius_config.add_classpath(path.resolve().as_posix())
-except ImportError:
-    # ignore so this module can be imported safely without java installed
-    pass
+class BigQueryDialect(sqlglot.dialects.BigQuery):
+    class Tokenizer(sqlglot.dialects.BigQuery.Tokenizer):
+        KEYWORDS = {
+            **sqlglot.dialects.BigQuery.Tokenizer.KEYWORDS,
+            # add missing type definition
+            "BYTES": sqlglot.tokens.TokenType.BINARY,
+        }
 
 
 def extract_table_references(sql: str) -> List[str]:
     """Return a list of tables referenced in the given SQL."""
-    # import jnius here so this module can be imported safely without java installed
-    import jnius  # noqa: E402
-
-    try:
-        ZetaSqlHelper = jnius.autoclass("com.mozilla.telemetry.ZetaSqlHelper")
-    except jnius.JavaException:
-        # replace jnius.JavaException because it's not available outside this function
-        raise ImportError(
-            "failed to import java class via jni, please build java dependencies "
-            "with: mvn package"
-        )
-    try:
-        result = ZetaSqlHelper.extractTableNamesFromStatement(sql)
-    except jnius.JavaException:
-        # Only use extractTableNamesFromScript when extractTableNamesFromStatement
-        # fails, because for scripts zetasql incorrectly includes CTE references from
-        # subquery expressions
-        try:
-            result = ZetaSqlHelper.extractTableNamesFromScript(sql)
-        except jnius.JavaException as e:
-            # replace jnius.JavaException because it's not available outside this function
-            raise ValueError(*e.args)
-    return [".".join(table.toArray()) for table in result.toArray()]
+    statements = sqlglot.parse(
+        (
+            sql
+            .replace("mozfun.hist.extract(", "mozfun.hist.extract_(")
+            .replace("mozfun.bits28.range(", "mozfun.bits28.range_(")
+            .replace("PERCENTILE_CONT(", "PERCENTILE_CONT_(")
+            .replace("PERCENTILE_DISC(", "PERCENTILE_DISC_(")
+        ),
+        BigQueryDialect
+    )
+    tables = set()
+    for expression in statements:
+        ctes = {cte.alias_or_name for cte in expression.find_all(sqlglot.exp.CTE)}
+        tables |= {str(table).split(" AS ", 1)[0] for table in expression.find_all(sqlglot.exp.Table)} - ctes
+    return sorted(tables)
 
 
 def extract_table_references_without_views(path: Path) -> Iterator[str]:
