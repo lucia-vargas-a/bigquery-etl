@@ -97,16 +97,14 @@ SELECT
     e.reportingUrl
   ),
   assert.null(e.requestId),
-  assert.equals("2023-04-10 15:41:55 UTC", e.submissionTimestamp),
+  assert.equals(TIMESTAMP("2023-04-10 15:41:55 UTC"), e.submissionTimestamp),
   assert.equals("topsites-click", e.originalDocType),
   assert.equals("contextual-services", e.originalNamespace),
   assert.equals(1, e.interactionCount),
   assert.false(e.flaggedFraud),
   assert.equals(
-    JSON(
-      '{\"host\":\"bridge.sfo1.ap01.net\",\"params\":{\"ci\":\"1681139740815.12791\",\"country_code\":\"DE\",\"ctag\":\"pd_sl_08aeb79c14ac3da0f8e9116cdcb0afadec2e24da616da802ba033bf6\",\"dma_code\":\"\",\"form_factor\":\"desktop\",\"key\":\"1681139740400900002.1\",\"os_family\":\"Windows\",\"product_version\":\"firefox_111\",\"region_code\":\"NW\",\"version\":\"16.0.0\"},\"path\":\"ctp\",\"scheme\":\"https:\"}'
-    ),
-    e.parsedReportingUrl
+    '{\"host\":\"bridge.sfo1.ap01.net\",\"params\":{\"ci\":\"1681139740815.12791\",\"country_code\":\"DE\",\"ctag\":\"pd_sl_08aeb79c14ac3da0f8e9116cdcb0afadec2e24da616da802ba033bf6\",\"dma_code\":\"\",\"form_factor\":\"desktop\",\"key\":\"1681139740400900002.1\",\"os_family\":\"Windows\",\"product_version\":\"firefox_111\",\"region_code\":\"NW\",\"version\":\"16.0.0\"},\"path\":\"ctp\",\"scheme\":\"https:\"}',
+    TO_JSON_STRING(e.parsedReportingUrl)
   )
 FROM
   extracted
