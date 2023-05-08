@@ -14,3 +14,4 @@ SELECT
   `mozfun.norm.os`(os) AS os_grouped
 FROM
   `{{ project_id }}.{{ app_name }}_derived.active_users_aggregates_v1`
+LIMIT 1000
