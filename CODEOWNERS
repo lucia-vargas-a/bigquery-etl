@@ -3,4 +3,4 @@
 /sql/moz-fx-data-shared-prod/search_terms @whd @jasonthomas
 /sql/moz-fx-data-shared-prod/search_terms_derived @whd @jasonthomas
 # Active Users
-active_users    @mozilla/kpi_table_reviewers
+/sql_generators/active_users/    @mozilla/kpi_table_reviewers
