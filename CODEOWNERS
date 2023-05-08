@@ -3,4 +3,4 @@
 /sql/moz-fx-data-shared-prod/search_terms @whd @jasonthomas
 /sql/moz-fx-data-shared-prod/search_terms_derived @whd @jasonthomas
 # Active Users
-/sql_generators/active_users/ @lucia-vargas-a
+/sql_generators/active_users/templates/desktop_query.sql @lucia-vargas-a
